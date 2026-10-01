@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>令和8年分 源泉所得税計算</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --line:#d8dee6;
+    --text:#1b2733;
+    --sub:#5b6b7c;
+    --accent:#1c6b4a;
+    --accent-weak:#e8f3ee;
+    --warn:#a3341f;
+    --warn-bg:#fdeeea;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:16px 14px 48px;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+  h1{
+    font-size:1.25rem;
+    margin:0 0 2px;
+    letter-spacing:.02em;
+  }
+  .subtitle{
+    font-size:.88rem;
+    color:var(--sub);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  .note{
+    font-size:.8rem;
+    color:var(--sub);
+    background:#eef1f4;
+    border-left:3px solid var(--line);
+    padding:8px 10px;
+    margin:0 0 16px;
+    border-radius:0 6px 6px 0;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 14px;
+    margin-bottom:14px;
+  }
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  label{
+    display:block;
+    font-size:.85rem;
+    font-weight:600;
+    margin-bottom:5px;
+  }
+  .hint{
+    display:block;
+    font-weight:400;
+    font-size:.74rem;
+    color:var(--sub);
+    margin-top:2px;
+    line-height:1.45;
+  }
+  .inputline{position:relative;display:flex;align-items:center;}
+  input[type="text"],select{
+    width:100%;
+    padding:11px 12px;
+    font-size:1.05rem;
+    font-family:inherit;
+    color:var(--text);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    appearance:none;
+  }
+  input[type="text"].money{
+    text-align:right;
+    padding-right:34px;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.02em;
+  }
+  input[type="text"].count{
+    text-align:right;
+    padding-right:34px;
+  }
+  .unit{
+    position:absolute;
+    right:12px;
+    font-size:.85rem;
+    color:var(--sub);
+    pointer-events:none;
+  }
+  input:focus,select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(28,107,74,.14);
+  }
+  select{background-image:linear-gradient(45deg,transparent 50%,var(--sub) 50%),linear-gradient(135deg,var(--sub) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px;}
+  .btns{display:flex;gap:10px;margin-top:18px;}
+  button{
+    font-family:inherit;
+    font-size:1rem;
+    font-weight:700;
+    border-radius:8px;
+    padding:13px 10px;
+    cursor:pointer;
+    border:1px solid transparent;
+  }
+  .primary{flex:2;background:var(--accent);color:#fff;}
+  .primary:active{background:#155539;}
+  .ghost{flex:1;background:#fff;color:var(--sub);border-color:var(--line);}
+  .ghost:active{background:#eef1f4;}
+  .alert{
+    background:var(--warn-bg);
+    border:1px solid #f0c4ba;
+    color:var(--warn);
+    font-size:.86rem;
+    padding:10px 12px;
+    border-radius:8px;
+    margin-bottom:14px;
+  }
+  .result{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .result-head{
+    background:var(--accent-weak);
+    padding:16px 14px 18px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+  }
+  .result-label{font-size:.85rem;color:var(--accent);font-weight:700;letter-spacing:.06em;}
+  .result-value{
+    font-size:2.6rem;
+    font-weight:800;
+    color:var(--accent);
+    line-height:1.15;
+    margin-top:4px;
+    font-variant-numeric:tabular-nums;
+    word-break:break-all;
+  }
+  .result-value .yen{font-size:1.1rem;margin-left:4px;font-weight:700;}
+  details{border-top:0;}
+  summary{
+    padding:13px 14px;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--sub);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▶";font-size:.7rem;transition:transform .15s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .steps{padding:0 14px 16px;}
+  .row{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:8px 0;
+    border-bottom:1px dotted #e2e7ec;
+    font-size:.92rem;
+  }
+  .row:last-child{border-bottom:none;}
+  .op{width:1.2em;flex:none;color:var(--sub);font-weight:700;text-align:center;}
+  .nm{flex:1;color:var(--sub);}
+  .vl{
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .row.total .nm,.row.total .vl{color:var(--text);font-weight:700;}
+  .row.total{background:#f7f9fa;margin:0 -14px;padding-left:14px;padding-right:14px;}
+  .row.final .vl{color:var(--accent);font-size:1.05rem;}
+  .row.memo{font-size:.8rem;color:var(--sub);justify-content:flex-end;}
+  .row.memo .vl{font-weight:400;color:var(--sub);}
+
+  /* ===== 追加：税額区分の切替 ===== */
+  .segwrap{margin-bottom:14px;}
+  .seglabel{
+    font-size:.85rem;
+    font-weight:600;
+    margin-bottom:6px;
+    display:block;
+  }
+  .seg{
+    display:flex;
+    gap:0;
+    background:#e7ebef;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:4px;
+  }
+  .seg input{position:absolute;opacity:0;pointer-events:none;width:0;height:0;}
+  .seg label{
+    flex:1;
+    margin:0;
+    text-align:center;
+    padding:11px 6px;
+    font-size:.95rem;
+    font-weight:700;
+    color:var(--sub);
+    border-radius:7px;
+    cursor:pointer;
+    user-select:none;
+    transition:background .12s,color .12s,box-shadow .12s;
+    line-height:1.3;
+  }
+  .seg input:checked + label{
+    background:var(--accent);
+    color:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.18);
+  }
+  .seg input:focus-visible + label{box-shadow:0 0 0 3px rgba(28,107,74,.3);}
+
+  /* ===== 追加：乙欄の詳細設定 ===== */
+  .adv{
+    border-top:1px dashed var(--line);
+    margin-top:16px;
+    padding-top:14px;
+  }
+  .advtitle{font-size:.8rem;font-weight:700;color:var(--sub);margin-bottom:9px;letter-spacing:.04em;}
+  .check{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    cursor:pointer;
+    font-size:.86rem;
+    font-weight:600;
+    margin:0;
+    line-height:1.45;
+  }
+  .check input{
+    appearance:none;
+    width:22px;
+    height:22px;
+    flex:none;
+    margin-top:1px;
+    border:1px solid var(--line);
+    border-radius:5px;
+    background:#fff;
+    cursor:pointer;
+    position:relative;
+  }
+  .check input:checked{background:var(--accent);border-color:var(--accent);}
+  .check input:checked::after{
+    content:"";
+    position:absolute;
+    left:7px;top:3px;
+    width:5px;height:10px;
+    border:solid #fff;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .check input:focus-visible{box-shadow:0 0 0 3px rgba(28,107,74,.2);}
+
+  /* ===== 追加：適用区分バッジ ===== */
+  .kubun{
+    margin-top:8px;
+    font-size:.8rem;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .kubun span{
+    display:inline-block;
+    background:#fff;
+    border:1px solid #bcd9cb;
+    border-radius:999px;
+    padding:2px 12px;
+    letter-spacing:.03em;
+  }
+  .row.head{
+    font-size:.78rem;
+    font-weight:700;
+    color:var(--sub);
+    letter-spacing:.04em;
+    border-bottom:1px solid var(--line);
+    padding-top:12px;
+  }
+  .row.head .nm{color:var(--sub);}
+
+  /* ===== 追加：社会保険料等の項目別入力 ===== */
+  .subfields{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fbfcfd;
+    padding:12px 12px 2px;
+  }
+  .subfield{margin-bottom:10px;}
+  .subfield label{
+    font-size:.8rem;
+    font-weight:500;
+    color:var(--sub);
+    margin-bottom:4px;
+  }
+  .subfield input[type="text"]{
+    padding:9px 12px;
+    font-size:1rem;
+    padding-right:34px;
+  }
+  .instotal{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+    border-top:1px solid var(--line);
+    margin:0 -12px;
+    padding:11px 12px;
+    background:#eef2f5;
+    border-radius:0 0 7px 7px;
+  }
+  .instotal-label{font-size:.82rem;font-weight:700;color:var(--sub);}
+  .instotal-value{
+    font-size:1.1rem;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .instotal-value .yen{font-size:.8rem;margin-left:3px;font-weight:700;color:var(--sub);}
+  .row.sub .nm{padding-left:1em;font-size:.86rem;}
+  .row.sub .vl{font-weight:500;}
+
+  /* ===== 追加：注意書き ===== */
+  .disclaimer{
+    margin:18px 2px 0;
+    font-size:.72rem;
+    line-height:1.7;
+    color:var(--sub);
+  }
+  .disclaimer li{margin-bottom:2px;}
+  .disclaimer ul{margin:0;padding-left:1.1em;}
+
+  [hidden]{display:none !important;}
+
+  @media (min-width:600px){
+    body{padding:28px 20px 60px;}
+    h1{font-size:1.5rem;}
+    .card,.steps{padding-left:20px;padding-right:20px;}
+    .row.total{margin:0 -20px;padding-left:20px;padding-right:20px;}
+    .result-value{font-size:3rem;}
+    .seg label{font-size:1rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>令和8年分 源泉所得税計算</h1>
+  <p class="subtitle">甲欄（機械計算）・乙欄対応</p>
+  <p class="note">令和8年分の給与等（月額）の源泉徴収税額を求めるツールです。甲欄は電算機計算の特例、乙欄は月額表によります。賞与の通常計算、日額表には対応していません。</p>
+
+  <form id="form" class="card" novalidate>
+    <!-- 税額区分の切替 -->
+    <div class="segwrap">
+      <span class="seglabel">税額区分</span>
+      <div class="seg">
+        <input type="radio" name="kubun" id="kubunKo" value="ko" checked>
+        <label for="kubunKo">甲欄（機械計算）</label>
+        <input type="radio" name="kubun" id="kubunOtsu" value="otsu">
+        <label for="kubunOtsu">乙欄</label>
+      </div>
+    </div>
+
+    <!-- 共通入力 -->
+    <div class="field">
+      <label for="pay">給与等の支給額（月額）</label>
+      <div class="inputline">
+        <input type="text" id="pay" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
+        <span class="unit">円</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>社会保険料等
+        <span class="hint">本人負担額を項目別に入力してください。合計額を給与等の支給額から控除します。</span>
+      </label>
+      <div class="subfields">
+        <div class="subfield">
+          <label for="insHealth">健康保険料</label>
+          <div class="inputline">
+            <input type="text" id="insHealth" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
+            <span class="unit">円</span>
+          </div>
+        </div>
+        <div class="subfield">
+          <label for="insPension">厚生年金保険料</label>
+          <div class="inputline">
+            <input type="text" id="insPension" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
+            <span class="unit">円</span>
+          </div>
+        </div>
+        <div class="subfield">
+          <label for="insCare">介護保険料</label>
+          <div class="inputline">
+            <input type="text" id="insCare" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
+            <span class="unit">円</span>
+          </div>
+        </div>
+        <div class="subfield">
+          <label for="insEmp">雇用保険料</label>
+          <div class="inputline">
+            <input type="text" id="insEmp" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
+            <span class="unit">円</span>
+          </div>
+        </div>
+        <div class="subfield">
+          <label for="insOther">その他
+            <span class="hint">小規模企業共済等掛金（iDeCoの給与天引分など）その他の社会保険料等</span>
+          </label>
+          <div class="inputline">
+            <input type="text" id="insOther" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
+            <span class="unit">円</span>
+          </div>
+        </div>
+        <div class="instotal">
+          <span class="instotal-label">社会保険料等 合計</span>
+          <span class="instotal-value"><span id="insTotal">0</span><span class="yen">円</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 甲欄専用 -->
+    <div id="koFields">
+      <div class="field">
+        <label for="spouse">源泉控除対象配偶者</label>
+        <select id="spouse">
+          <option value="0">なし</option>
+          <option value="1">あり</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="dep">源泉控除対象親族の人数</label>
+        <div class="inputline">
+          <input type="text" id="dep" class="count" inputmode="numeric" autocomplete="off" placeholder="0">
+          <span class="unit">人</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="add">加算人数
+          <span class="hint">本人・家族の障害者、寡婦、ひとり親、勤労学生など、源泉計算上1人として加算する人数</span>
+        </label>
+        <div class="inputline">
+          <input type="text" id="add" class="count" inputmode="numeric" autocomplete="off" placeholder="0">
+          <span class="unit">人</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 乙欄専用 -->
+    <div id="otsuFields" hidden>
+      <div class="adv">
+        <div class="advtitle">詳細設定</div>
+        <label class="check" for="subDecl">
+          <input type="checkbox" id="subDecl">
+          <span>従たる給与についての扶養控除等申告書の提出あり</span>
+        </label>
+        <div class="field" id="subDepField" hidden style="margin-top:14px;">
+          <label for="subDep">扶養親族等の数
+            <span class="hint">当該申告書に記載された扶養親族等の数。1人につき1,610円を控除します。</span>
+          </label>
+          <div class="inputline">
+            <input type="text" id="subDep" class="count" inputmode="numeric" autocomplete="off" placeholder="0">
+            <span class="unit">人</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button type="submit" class="primary">所得税を計算</button>
+      <button type="button" class="ghost" id="clear">クリア</button>
+    </div>
+  </form>
+
+  <div id="alert" class="alert" hidden></div>
+
+  <div id="result" class="result" hidden>
+    <div class="result-head">
+      <div class="result-label">源泉徴収税額</div>
+      <div class="result-value"><span id="taxMain">0</span><span class="yen">円</span></div>
+      <div class="kubun">適用区分 <span id="kubunBadge">甲欄（機械計算）</span></div>
+    </div>
+    <div class="steps" id="summary"></div>
+    <details id="detail">
+      <summary>計算根拠を見る</summary>
+      <div class="steps" id="steps"></div>
+    </details>
+  </div>
+
+  <div class="disclaimer">
+    <ul>
+      <li>本ツールは令和8年分の源泉徴収税額の確認用ツールです。</li>
+      <li>乙欄は令和8年分給与所得の源泉徴収税額表（月額表）に基づいて計算しています。</li>
+      <li>税額には復興特別所得税相当額が含まれています。</li>
+      <li>最終確認は国税庁の源泉徴収税額表等で行ってください。</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// ===CALC-START===
+// 給与所得控除（1円未満切上げ）
+function salaryDeduction(A){
+  if(A <= 158333) return 54167;
+  if(A <= 299999) return Math.ceil(A * 30 / 100) + 6667;
+  if(A <= 549999) return Math.ceil(A * 20 / 100) + 36667;
+  if(A <= 708330) return Math.ceil(A * 10 / 100) + 91667;
+  return 162500;
+}
+// 基礎控除（判定はA＝社会保険料等控除後の給与額）
+function basicDeduction(A){
+  if(A <= 2120833) return 48334;
+  if(A <= 2162499) return 40000;
+  if(A <= 2204166) return 26667;
+  if(A <= 2245833) return 13334;
+  return 0;
+}
+// 給与甲欄所得税率（rateは％を1000倍した整数＝5.105% → 5105）
+function taxBracket(B){
+  if(B <= 162500)   return {rate:5105,  ded:0};
+  if(B <= 275000)   return {rate:10210, ded:8296};
+  if(B <= 579166)   return {rate:20420, ded:36374};
+  if(B <= 750000)   return {rate:23483, ded:54113};
+  if(B <= 1500000)  return {rate:33693, ded:130688};
+  if(B <= 3333333)  return {rate:40840, ded:237893};
+  return {rate:45945, ded:408061};
+}
+// 本体：すべて整数演算で行い、浮動小数点誤差を避ける
+function calcTax(input){
+  var pay    = input.pay|0;
+  var ins    = input.ins|0;
+  var spouse = input.spouse ? 1 : 0;
+  var dep    = input.dep|0;
+  var add    = input.add|0;
+
+  var A = pay - ins;
+  if(A < 0) A = 0;
+
+  var sd  = salaryDeduction(A);
+  var sp  = spouse ? 31667 : 0;
+  var dp  = 31667 * (dep + add);
+  var bd  = basicDeduction(A);
+
+  var B = A - sd - sp - dp - bd;
+  if(B < 0) B = 0;
+
+  var br = taxBracket(B);
+  // 税額を 1/100000 円単位の整数で保持（rate は 1/100000 単位の率）
+  var scaled = B * br.rate - br.ded * 100000;
+  if(scaled < 0) scaled = 0;
+
+  // 10円未満四捨五入：1円＝100000 → 10円＝1000000
+  var tax = Math.round(scaled / 1000000) * 10;
+
+  return {
+    pay:pay, ins:ins, A:A,
+    salaryDed:sd, spouseDed:sp, depDed:dp, basicDed:bd,
+    B:B, rate:br.rate, rateDed:br.ded,
+    rawScaled:scaled, raw:scaled / 100000,
+    tax:tax
+  };
+}
+// ===CALC-END===
+
+// 【15】の命名に合わせた別名。中身は既存 calcTax をそのまま呼ぶだけで、ロジックは一切変更していない。
+var calculateKoRan = calcTax;
+
+// ===OTSU-DATA-START===
+// ===== 令和8年分 給与所得の源泉徴収税額表（月額表）乙欄 =====
+// 出典：令和8年分 源泉徴収税額表 1〜5ページ 右端「乙」欄
+// [その月の社会保険料等控除後の給与等の金額（以上）, 税額]
+// 上限は次の要素の「以上」の値（＝未満）。最終要素737,000の未満は740,000。
+// 740,000円以上は OTSU_FORMULA で計算する。
+// 令和9年分への更新時は、この配列と OTSU_FORMULA / OTSU_LOW_RATE / OTSU_DEP_DEDUCTION だけを差し替える。
+var OTSU_TABLE = [
+  [105000,3800],[107000,3800],[109000,3900],[111000,4000],[113000,4100],
+  [115000,4100],[117000,4200],[119000,4300],[121000,4300],[123000,4400],
+  [125000,4700],[127000,5000],[129000,5300],[131000,5500],[133000,5800],
+  [135000,6100],[137000,6400],[139000,6700],[141000,7000],[143000,7400],
+  [145000,7700],[147000,8000],[149000,8300],[151000,8600],[153000,8900],
+  [155000,9200],[157000,9500],[159000,9800],[161000,10100],[163000,10400],
+  [165000,10700],[167000,11000],[169000,11300],[171000,11500],[173000,11800],
+  [175000,12100],[177000,12500],[179000,12800],[181000,13300],[183000,14000],
+  [185000,14700],[187000,15400],[189000,16100],[191000,16800],[193000,17600],
+  [195000,18300],[197000,19000],[199000,19700],[201000,20400],[203000,21000],
+  [205000,21700],[207000,22500],[209000,23000],[211000,23600],[213000,24100],
+  [215000,24700],[217000,25300],[219000,25800],[221000,26400],[224000,27500],
+  [227000,28500],[230000,29500],[233000,30500],[236000,31500],[239000,32600],
+  [242000,33600],[245000,34600],[248000,35500],[251000,36600],[254000,37600],
+  [257000,38600],[260000,39600],[263000,40600],[266000,41700],[269000,42700],
+  [272000,43700],[275000,44700],[278000,45600],[281000,46700],[284000,47800],
+  [287000,48900],[290000,50000],[293000,51300],[296000,52400],[299000,53600],
+  [302000,54500],[305000,55200],[308000,56100],[311000,56900],[314000,57700],
+  [317000,58500],[320000,59500],[323000,60500],[326000,61600],[329000,62600],
+  [332000,63700],[335000,64700],[338000,65800],[341000,66800],[344000,67800],
+  [347000,68800],[350000,69800],[353000,70900],[356000,71900],[359000,72900],
+  [362000,73900],[365000,74900],[368000,76000],[371000,76900],[374000,77800],
+  [377000,78700],[380000,79600],[383000,80600],[386000,82000],[389000,83600],
+  [392000,85400],[395000,87100],[398000,88700],[401000,90500],[404000,92200],
+  [407000,93800],[410000,95600],[413000,97300],[416000,98900],[419000,100700],
+  [422000,102400],[425000,104000],[428000,105800],[431000,107500],[434000,109100],
+  [437000,110900],[440000,112600],[443000,114200],[446000,116000],[449000,117600],
+  [452000,119400],[455000,121100],[458000,122700],[461000,124500],[464000,126200],
+  [467000,127800],[470000,129600],[473000,131200],[476000,132800],[479000,134500],
+  [482000,136100],[485000,137600],[488000,139300],[491000,140900],[494000,142500],
+  [497000,144100],[500000,145700],[503000,147300],[506000,149000],[509000,150500],
+  [512000,152100],[515000,153800],[518000,155400],[521000,156900],[524000,158600],
+  [527000,160200],[530000,161600],[533000,163200],[536000,164600],[539000,166000],
+  [542000,167500],[545000,169000],[548000,170500],[551000,171900],[554000,173400],
+  [557000,174900],[560000,176300],[563000,177900],[566000,179300],[569000,180700],
+  [572000,182200],[575000,183700],[578000,185200],[581000,186600],[584000,188100],
+  [587000,189600],[590000,191000],[593000,192600],[596000,194000],[599000,195400],
+  [602000,197000],[605000,198400],[608000,199900],[611000,201300],[614000,202800],
+  [617000,204300],[620000,205700],[623000,207300],[626000,208700],[629000,210100],
+  [632000,211700],[635000,213100],[638000,214600],[641000,215900],[644000,217000],
+  [647000,218000],[650000,219000],[653000,220000],[656000,221000],[659000,222100],
+  [662000,223100],[665000,224100],[668000,225000],[671000,226000],[674000,227100],
+  [677000,228100],[680000,229100],[683000,230100],[686000,231500],[689000,233000],
+  [692000,234500],[695000,236100],[698000,237600],[701000,239100],[704000,240800],
+  [707000,242300],[710000,243800],[713000,245300],[716000,246900],[719000,248400],
+  [722000,250000],[725000,251600],[728000,253100],[731000,254600],[734000,256200],
+  [737000,257700]
+];
+
+// 表の上限（この額以上は計算式帯）
+var OTSU_TABLE_LIMIT = 740000;
+
+// 105,000円未満の率（％）
+var OTSU_LOW_RATE = 3.063;
+var OTSU_LOW_LIMIT = 105000;
+
+// 高額帯（PDF 5〜7ページ 乙欄の結合セル）
+// 乙欄は甲欄と違い 790,000円・960,000円・2,130,000円・2,170,000円・2,210,000円・
+// 2,250,000円・3,500,000円に税率の切替が無く、次の2本だけで構成されている。
+//   740,000円〜1,709,999円 : 259,200円 ＋（A－  740,000円）×40.84％
+//   1,710,000円〜          : 655,400円 ＋（A－1,710,000円）×45.945％
+var OTSU_FORMULA = [
+  { base: 740000,  tax: 259200, rate: 40.84 },
+  { base: 1710000, tax: 655400, rate: 45.945 }
+];
+
+// 従たる給与についての扶養控除等申告書：扶養親族等1人につき控除する額
+var OTSU_DEP_DEDUCTION = 1610;
+// ===OTSU-DATA-END===
+
+// ===OTSU-CALC-START===
+// 乙欄：社会保険料等控除後の給与等の金額から税額を求める
+function otsuTaxFromAmount(A){
+  // (1) 105,000円未満 … 3.063％（1円未満切捨て）
+  if(A < OTSU_LOW_LIMIT){
+    // 1/100000円単位の整数演算で浮動小数点誤差を避ける（3.063％ → 3063）
+    var scaled = A * 3063;
+    return {
+      kind:"rate",
+      tax: Math.floor(scaled / 100000),
+      rawScaled: scaled,
+      rate: OTSU_LOW_RATE
+    };
+  }
+  // (2) 105,000円以上740,000円未満 … 月額表 乙欄の該当行
+  if(A < OTSU_TABLE_LIMIT){
+    var t = OTSU_TABLE;
+    var lo = 0, hi = t.length - 1, idx = 0;
+    while(lo <= hi){
+      var mid = (lo + hi) >> 1;
+      if(t[mid][0] <= A){ idx = mid; lo = mid + 1; } else { hi = mid - 1; }
+    }
+    var upper = (idx + 1 < t.length) ? t[idx + 1][0] : OTSU_TABLE_LIMIT;
+    return {
+      kind:"table",
+      tax: t[idx][1],
+      rowMin: t[idx][0],
+      rowMax: upper
+    };
+  }
+  // (3) 740,000円以上 … 計算式帯（1円未満切捨て）
+  var f = OTSU_FORMULA[0];
+  for(var i = 0; i < OTSU_FORMULA.length; i++){
+    if(A >= OTSU_FORMULA[i].base) f = OTSU_FORMULA[i];
+  }
+  var excess = A - f.base;
+  var rateInt = Math.round(f.rate * 1000);   // 40.84％→40840 / 45.945％→45945
+  var addScaled = excess * rateInt;          // 1/100000円単位
+  return {
+    kind:"formula",
+    tax: f.tax + Math.floor(addScaled / 100000),
+    base: f.base,
+    baseTax: f.tax,
+    rate: f.rate,
+    excess: excess,
+    addScaled: addScaled,
+    add: Math.floor(addScaled / 100000)
+  };
+}
+
+// 乙欄 本体
+function calculateOtsuRan(input){
+  var pay = input.pay|0;
+  var ins = input.ins|0;
+  var sub = input.subDeclared ? 1 : 0;      // 従たる給与についての扶養控除等申告書の提出
+  var dep = sub ? (input.subDep|0) : 0;     // 扶養親族等の数
+
+  var A = pay - ins;
+  if(A < 0) A = 0;
+
+  var r = otsuTaxFromAmount(A);
+  var beforeDeduction = r.tax;
+  var depDeduction = dep * OTSU_DEP_DEDUCTION;
+  var tax = beforeDeduction - depDeduction;
+  if(tax < 0) tax = 0;                      // 控除後がマイナスにならないようにする
+
+  return {
+    pay:pay, ins:ins, A:A,
+    detail:r,
+    beforeDeduction:beforeDeduction,
+    subDeclared:!!sub, subDep:dep, depDeduction:depDeduction,
+    tax:tax
+  };
+}
+// ===OTSU-CALC-END===
+
+// ---------- 表示用フォーマッタ ----------
+function fmt(n){
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+// 1/100000円単位の整数を「193,975.05256」形式に
+function fmtScaled(scaled){
+  var yen = Math.floor(scaled / 100000);
+  var frac = String(scaled % 100000).padStart(5, "0").replace(/0+$/, "");
+  return fmt(yen) + (frac ? "." + frac : "");
+}
+function fmtRate(rate){
+  return (rate / 1000).toFixed(3);
+}
+
+// ---------- 入力制御 ----------
+var payEl = document.getElementById("pay");
+// 社会保険料等は項目別に入力し、合計を控除額として使う
+var insParts = [
+  { key:"health",  name:"健康保険料",     el: document.getElementById("insHealth")  },
+  { key:"pension", name:"厚生年金保険料", el: document.getElementById("insPension") },
+  { key:"care",    name:"介護保険料",     el: document.getElementById("insCare")    },
+  { key:"emp",     name:"雇用保険料",     el: document.getElementById("insEmp")     },
+  { key:"other",   name:"その他",         el: document.getElementById("insOther")   }
+];
+var insTotalEl = document.getElementById("insTotal");
+var depEl = document.getElementById("dep");
+var addEl = document.getElementById("add");
+var spouseEl = document.getElementById("spouse");
+var subDeclEl = document.getElementById("subDecl");
+var subDepEl = document.getElementById("subDep");
+var subDepField = document.getElementById("subDepField");
+var koFields = document.getElementById("koFields");
+var otsuFields = document.getElementById("otsuFields");
+var kubunKoEl = document.getElementById("kubunKo");
+var kubunOtsuEl = document.getElementById("kubunOtsu");
+var kubunBadge = document.getElementById("kubunBadge");
+var alertEl = document.getElementById("alert");
+var resultEl = document.getElementById("result");
+var stepsEl = document.getElementById("steps");
+var summaryEl = document.getElementById("summary");
+var taxMainEl = document.getElementById("taxMain");
+var detailEl = document.getElementById("detail");
+
+function currentKubun(){
+  return kubunOtsuEl.checked ? "otsu" : "ko";
+}
+
+function digitsOnly(s){
+  return (s || "").replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })
+                  .replace(/[^0-9]/g, "");  // マイナス記号・記号類はすべて除去＝マイナス入力不可
+}
+function valueOf(el){
+  var d = digitsOnly(el.value);
+  return d === "" ? null : parseInt(d, 10);
+}
+// 社会保険料等の合計（内訳つき）
+function insBreakdown(){
+  var parts = [], total = 0;
+  insParts.forEach(function(p){
+    var v = valueOf(p.el) || 0;
+    total += v;
+    parts.push({ name: p.name, value: v });
+  });
+  return { parts: parts, total: total };
+}
+function refreshInsTotal(){
+  insTotalEl.textContent = fmt(insBreakdown().total);
+}
+
+var numericEls = [payEl, depEl, addEl, subDepEl].concat(insParts.map(function(p){ return p.el; }));
+numericEls.forEach(function(el){
+  el.addEventListener("input", function(){
+    var d = digitsOnly(el.value);
+    if(d !== ""){
+      d = String(parseInt(d, 10));               // 先頭ゼロを除去
+      el.value = el.classList.contains("money") ? fmt(d) : d;
+    }else{
+      el.value = "";
+    }
+    refreshInsTotal();                           // 合計を即時更新
+    hide();
+  });
+  el.addEventListener("keydown", function(e){
+    if(e.key === "-" || e.key === "+" || e.key === "e") e.preventDefault();
+  });
+});
+spouseEl.addEventListener("change", hide);
+
+// 区分の切替：支給額・社会保険料等は保持したまま、専用欄だけ出し入れする
+[kubunKoEl, kubunOtsuEl].forEach(function(el){
+  el.addEventListener("change", function(){
+    var otsu = currentKubun() === "otsu";
+    koFields.hidden = otsu;
+    otsuFields.hidden = !otsu;
+    hide();
+  });
+});
+
+// 従たる給与の申告書：ONのときだけ扶養親族等の数を表示
+subDeclEl.addEventListener("change", function(){
+  subDepField.hidden = !subDeclEl.checked;
+  if(!subDeclEl.checked) subDepEl.value = "";
+  hide();
+});
+
+function hide(){
+  resultEl.hidden = true;
+  alertEl.hidden = true;
+}
+function warn(msg){
+  alertEl.textContent = msg;
+  alertEl.hidden = false;
+  resultEl.hidden = true;
+}
+
+// ---------- 計算実行 ----------
+document.getElementById("form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var pay = valueOf(payEl);
+  var bd = insBreakdown();
+  var ins = bd.total;
+
+  if(pay === null){
+    warn("給与等の支給額を入力してください。");
+    payEl.focus();
+    return;
+  }
+  if(ins > pay){
+    warn("社会保険料等が給与等の支給額を超えています。（社会保険料等 合計 " + fmt(ins) + "円 ／ 支給額 " + fmt(pay) + "円）");
+    return;
+  }
+  alertEl.hidden = true;
+  lastBreakdown = bd;
+
+  if(currentKubun() === "otsu"){
+    var ro = calculateOtsuRan({
+      pay: pay,
+      ins: ins,
+      subDeclared: subDeclEl.checked,
+      subDep: valueOf(subDepEl) || 0
+    });
+    renderOtsu(ro);
+  }else{
+    var dep = valueOf(depEl) || 0;
+    var add = valueOf(addEl) || 0;
+    var rk = calculateKoRan({pay:pay, ins:ins, spouse:spouseEl.value === "1", dep:dep, add:add});
+    renderKo(rk);
+  }
+});
+
+var lastBreakdown = null;   // 直近の社会保険料等の内訳（計算根拠の表示用）
+
+function row(op, name, value, cls){
+  return '<div class="row ' + (cls || '') + '">' +
+           '<span class="op">' + op + '</span>' +
+           '<span class="nm">' + name + '</span>' +
+           '<span class="vl">' + value + '</span>' +
+         '</div>';
+}
+
+// 計算根拠に社会保険料等の項目別内訳を出す（金額が入っている項目のみ）
+function insRows(){
+  if(!lastBreakdown) return "";
+  var h = "";
+  lastBreakdown.parts.forEach(function(p){
+    if(p.value > 0) h += row("", p.name, fmt(p.value) + " 円", "sub");
+  });
+  return h;
+}
+
+// 共通の内訳（【10】）
+function renderSummary(r, kubunText){
+  var h = "";
+  h += row("", "給与等の支給額", fmt(r.pay) + " 円");
+  h += row("", "社会保険料等", fmt(r.ins) + " 円");
+  h += row("", "社会保険料等控除後の給与等", fmt(r.A) + " 円");
+  h += row("", "適用区分", kubunText);
+  h += row("", "源泉徴収税額", fmt(r.tax) + " 円", "total final");
+  summaryEl.innerHTML = h;
+}
+
+function show(tax, kubunText){
+  taxMainEl.textContent = fmt(tax);
+  kubunBadge.textContent = kubunText;
+  resultEl.hidden = false;
+  resultEl.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+// ---------- 甲欄の表示（既存のまま） ----------
+function renderKo(r){
+  var kubunText = "甲欄（機械計算）";
+  renderSummary(r, kubunText);
+  var h = "";
+  h += row("", "支給額", fmt(r.pay) + " 円");
+  h += row("－", "社会保険料等", fmt(r.ins) + " 円");
+  h += insRows();
+  h += row("＝", "社会保険料等控除後給与額A", fmt(r.A) + " 円", "total");
+  h += row("－", "給与所得控除", fmt(r.salaryDed) + " 円");
+  h += row("－", "配偶者控除等", fmt(r.spouseDed) + " 円");
+  h += row("－", "扶養控除等", fmt(r.depDed) + " 円");
+  h += row("－", "基礎控除", fmt(r.basicDed) + " 円");
+  h += row("＝", "課税給与所得金額B", fmt(r.B) + " 円", "total");
+  h += row("", "税率", fmtRate(r.rate) + " ％");
+  h += row("", "税率控除額", fmt(r.rateDed) + " 円");
+  h += row("", "計算前税額", fmtScaled(r.rawScaled) + " 円");
+  h += row("", "", "↓ 10円未満四捨五入", "memo");
+  h += row("", "所得税", fmt(r.tax) + " 円", "total final");
+  stepsEl.innerHTML = h;
+  show(r.tax, kubunText);
+}
+
+// ---------- 乙欄の表示（【11】） ----------
+function renderOtsu(r){
+  var kubunText = "乙欄（月額表）";
+  renderSummary(r, kubunText);
+  var d = r.detail;
+  var h = "";
+  h += row("", "給与等の支給額", fmt(r.pay) + " 円");
+  h += row("－", "社会保険料等", fmt(r.ins) + " 円");
+  h += insRows();
+  h += row("＝", "社会保険料等控除後給与", fmt(r.A) + " 円", "total");
+
+  if(d.kind === "rate"){
+    h += row("", "判定", "105,000円未満のため3.063％を適用", "head");
+    h += row("", fmt(r.A) + " × 3.063％", fmtScaled(d.rawScaled) + " 円");
+    h += row("", "", "↓ 1円未満切捨て", "memo");
+    h += row("", "税額表による税額", fmt(d.tax) + " 円", "total");
+  }else if(d.kind === "table"){
+    h += row("", "令和8年分 月額表 乙欄", "", "head");
+    h += row("", "該当行", fmt(d.rowMin) + "円以上 " + fmt(d.rowMax) + "円未満");
+    h += row("", "税額表による税額", fmt(d.tax) + " 円", "total");
+  }else{
+    h += row("", "令和8年分 月額表 乙欄（計算式）", "", "head");
+    h += row("", "基準額", fmt(d.base) + " 円");
+    h += row("", "基準税額", fmt(d.baseTax) + " 円");
+    h += row("", "超過額", fmt(d.excess) + " 円");
+    h += row("×", "税率", d.rate.toFixed(3).replace(/0+$/, "").replace(/\.$/, "") + " ％");
+    h += row("＝", "加算額", fmtScaled(d.addScaled) + " 円");
+    h += row("", "", "↓ 1円未満切捨て", "memo");
+    h += row("", fmt(d.baseTax) + " ＋ " + fmt(d.add), fmt(d.tax) + " 円", "total");
+  }
+
+  if(r.subDeclared){
+    h += row("", "従たる給与についての扶養控除等申告書", "提出あり", "head");
+    h += row("", "扶養親族等の数", fmt(r.subDep) + " 人");
+    h += row("－", "1,610円 × " + fmt(r.subDep) + "人", fmt(r.depDeduction) + " 円");
+    if(r.beforeDeduction - r.depDeduction < 0){
+      h += row("", "", "↓ マイナスのため0円", "memo");
+    }
+  }
+  h += row("", "源泉徴収税額", fmt(r.tax) + " 円", "total final");
+  stepsEl.innerHTML = h;
+  show(r.tax, kubunText);
+}
+
+// ---------- クリア ----------
+document.getElementById("clear").addEventListener("click", function(){
+  payEl.value = ""; depEl.value = ""; addEl.value = "";
+  insParts.forEach(function(p){ p.el.value = ""; });
+  refreshInsTotal();
+  lastBreakdown = null;
+  spouseEl.value = "0";
+  subDeclEl.checked = false;
+  subDepEl.value = "";
+  subDepField.hidden = true;
+  kubunKoEl.checked = true;               // 税額区分は甲欄（機械計算）に戻す
+  koFields.hidden = false;
+  otsuFields.hidden = true;
+  detailEl.open = false;
+  hide();
+  payEl.focus();
+});
+</script>
+</body>
+</html>
