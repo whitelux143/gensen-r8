@@ -270,6 +270,12 @@
     transform:rotate(45deg);
   }
   .check input:focus-visible{box-shadow:0 0 0 3px rgba(28,107,74,.2);}
+  .checknote{
+    margin:8px 0 0 32px;
+    font-size:.74rem;
+    line-height:1.55;
+    color:var(--sub);
+  }
 
   /* ===== 追加：適用区分バッジ ===== */
   .kubun{
@@ -380,7 +386,9 @@
 
     <!-- 共通入力 -->
     <div class="field">
-      <label for="pay">給与等の支給額（月額）</label>
+      <label for="pay">給与等の支給額（月額）
+        <span class="hint">社会保険料等を控除する前の総支給額。非課税となる通勤手当は含めません。</span>
+      </label>
       <div class="inputline">
         <input type="text" id="pay" class="money" inputmode="numeric" autocomplete="off" placeholder="0">
         <span class="unit">円</span>
@@ -473,6 +481,7 @@
           <input type="checkbox" id="subDecl">
           <span>従たる給与についての扶養控除等申告書の提出あり</span>
         </label>
+        <p class="checknote">掛け持ち勤務の方が従たる給与の支払者に提出する様式です。主たる給与の「給与所得者の扶養控除等申告書」とは別のものです。該当者がいなければチェック不要です。</p>
         <div class="field" id="subDepField" hidden style="margin-top:14px;">
           <label for="subDep">扶養親族等の数
             <span class="hint">当該申告書に記載された扶養親族等の数。1人につき1,610円を控除します。</span>
